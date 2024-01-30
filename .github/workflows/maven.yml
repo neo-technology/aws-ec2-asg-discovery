@@ -21,5 +21,13 @@ jobs:
         with:
           java-version: 17
           distribution: zulu
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
+      - uses: s4u/maven-settings-action@v2.3.0
+        with:
+          servers: |
+            [{
+                "id": "neo4j-enterprise",
+                "username": "${{ secrets.MAVEN_REPO_USER }}",
+                "password": "${{ secrets.MAVEN_REPO_PASSWORD }}"
+            }]
+- name: Build with Maven
+        run: mvn -B --settings settings.xml clean package --file pom.xml
