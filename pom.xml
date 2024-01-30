@@ -23,7 +23,7 @@
             </snapshots>
             <id>neo4j-enterprise</id>
             <name>Neo4j Enterprise Artifacts</name>
-            <url>http://m2.neo4j.com/enterprise</url>
+            <url>https://m2.neo4j.com/enterprise</url>
         </repository>
     </repositories>
 
