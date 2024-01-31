@@ -5,6 +5,7 @@ import static com.neo4j.configuration.ClusterAddressSettings.discovery_advertise
 import static java.lang.String.format;
 
 import com.neo4j.causalclustering.discovery.resolve.BaseRemotesResolver;
+import com.neo4j.configuration.DiscoverySettings;
 import org.neo4j.annotations.service.ServiceProvider;
 import org.neo4j.common.DependencyResolver;
 import org.neo4j.configuration.Config;
@@ -22,6 +23,7 @@ public class AsgResolver extends BaseRemotesResolver {
     private String awsKey;
     private String awsSecret;
     private String awsRegion;
+    private int discoveryPort;
     private AwsClient awsClient;
     private InternalLog log;
 
@@ -36,6 +38,9 @@ public class AsgResolver extends BaseRemotesResolver {
         awsKey = checkConfig(config, Ec2Settings.aws_key);
         awsSecret = checkConfig(config, Ec2Settings.aws_secret);
         awsRegion = checkConfig(config, Ec2Settings.aws_region);
+
+        discoveryPort = checkConfig(config, DiscoverySettings.discovery_listen_address).getPort();
+
         log = logService.getUserLog(AsgResolver.class);
         log.info("Init of discovery plugin "+this.configDescription());
         awsClient = externalDependencies.containsDependency(AwsClient.class)
@@ -46,7 +51,12 @@ public class AsgResolver extends BaseRemotesResolver {
     @Override
     protected Stream<SocketAddress> resolveInternal() {
         try {
-            return awsClient.getVmAddressesByAsgName(selector).map(s -> new SocketAddress(s));
+            return awsClient.getVmAddressesByAsgName(selector)
+                    .map(s -> {
+                        SocketAddress addr = new SocketAddress(s, discoveryPort);
+
+                        return addr;
+                    });
         } catch (Exception e) {
             log.error("Failed discovery "+e.getMessage());
         }

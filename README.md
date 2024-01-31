@@ -4,6 +4,11 @@
 This neo4j plugin implements cluster discovery for a cluster deployed in an AWS EC2 Auto-scaling group. 
 It retrieves the list of network addresses of the group's VMs, and feeds it to Neo4j's cluster discovery module.
 
+Notes:
+- It retrieves the VMs' private DnsName or IpAddress.
+- It retrieves the discovery TCP port from the neo4j setting "server.discovery.listen_address"
+
+
 **Compatilibity**
 
 Neo4j 5.7+
@@ -32,3 +37,5 @@ The AWS User requires the following permissions :
 - "ec2:DescribeInstances",
 - "autoscaling:DescribeAutoScalingGroups"
 
+
+The auto-scaling group VMs require a Security Group that allows traffic on TCP ports 5000, 6000, 7000, 7688 (for internal cluster communication) as well as TCP ports 7474 and 7687 (for external access).
