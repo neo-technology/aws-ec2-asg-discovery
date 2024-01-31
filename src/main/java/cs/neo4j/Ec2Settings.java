@@ -18,22 +18,21 @@ public class Ec2Settings implements SettingsDeclaration {
 
     @Description("Auto-scaling group name")
     public static final Setting<String> asg_name = newBuilder(
-            "dbms.aws.asg_name", STRING, null)
+            "discovery.aws.asg_name", STRING, null)
             .build();
 
     @Description("AWS access key")
     public static final Setting<String> aws_key = newBuilder(
-            "dbms.aws.key", STRING, null)
+            "discovery.aws.key", STRING, null)
             .build();
 
     @Description("AWS secret")
     public static final Setting<String> aws_secret = newBuilder(
-            "dbms.aws.secret", STRING, null)
+            "discovery.aws.secret", STRING, null)
             .build();
-
 
     @Description("AWS region")
     public static final Setting<String> aws_region = newBuilder(
-            "dbms.aws.region", STRING, null)
+            "discovery.aws.region", STRING, null)
             .build();
 }

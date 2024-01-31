@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient;
 import software.amazon.awssdk.services.autoscaling.model.AutoScalingGroup;
@@ -18,20 +20,28 @@ import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
 
 public class AwsClient extends LifecycleAdapter {
 
-    public static String accessKey;
-    public static String secretKey;
-    public static String region;
+    private static String accessKey;
+    private static String secretKey;
+    private static String region;
 
 
     private AutoScalingClient autoScalingClient;
     private Ec2Client ec2Client;
+
+    public AwsClient(String region) {
+        this.region=region;
+        createClients();
+    }
 
     public AwsClient(String accessKey, String secretKey, String region) {
         this.accessKey=accessKey;
         this.secretKey=secretKey;
         this.region=region;
 
+        createClients();
+    }
 
+    private void createClients(){
         this.autoScalingClient = AutoScalingClient.builder()
                 .region(Region.of(region))
                 .credentialsProvider(awsCredentialsProvider())
@@ -44,7 +54,11 @@ public class AwsClient extends LifecycleAdapter {
     }
 
     private AwsCredentialsProvider awsCredentialsProvider() {
-        return () -> AwsBasicCredentials.create(accessKey, secretKey);
+        if (accessKey != null && secretKey != null) {
+            return () -> AwsBasicCredentials.create(accessKey, secretKey);
+        } else {
+            return InstanceProfileCredentialsProvider.builder().build();
+        }
     }
 
     private AutoScalingGroup getAsgByName(String nameSelector) {
