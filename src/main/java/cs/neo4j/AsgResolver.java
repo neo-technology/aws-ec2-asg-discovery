@@ -34,18 +34,29 @@ public class AsgResolver extends BaseRemotesResolver {
 
     @Override
     protected void internalInit(Config config, LogService logService, DependencyResolver externalDependencies) {
-        selector = checkConfig(config, Ec2Settings.asg_name);
-        awsKey = checkConfig(config, Ec2Settings.aws_key);
-        awsSecret = checkConfig(config, Ec2Settings.aws_secret);
-        awsRegion = checkConfig(config, Ec2Settings.aws_region);
+        log = logService.getUserLog(AsgResolver.class);
+        log.info("Init of discovery plugin "+this.configDescription());
 
         discoveryPort = checkConfig(config, DiscoverySettings.discovery_listen_address).getPort();
 
-        log = logService.getUserLog(AsgResolver.class);
-        log.info("Init of discovery plugin "+this.configDescription());
+        selector = checkConfig(config, Ec2Settings.asg_name);
+        awsRegion = checkConfig(config, Ec2Settings.aws_region);
+
+        awsKey = config.get(Ec2Settings.aws_key);
+        awsSecret = config.get(Ec2Settings.aws_secret);
+
         awsClient = externalDependencies.containsDependency(AwsClient.class)
                 ? externalDependencies.resolveDependency(AwsClient.class)
-                : new AwsClient(awsKey, awsSecret, awsRegion);
+                : instantiateAwsClient(awsKey, awsSecret, awsRegion);
+
+    }
+
+    private AwsClient instantiateAwsClient(String accessKey, String secretKey, String region) {
+        if (accessKey != null  && secretKey != null) {
+            return new AwsClient(accessKey, secretKey, region);
+        } else {
+            return new AwsClient(region);
+        }
     }
 
     @Override
