@@ -23,6 +23,7 @@ public class AsgResolver extends BaseRemotesResolver {
     private String awsKey;
     private String awsSecret;
     private String awsRegion;
+    private Ec2Settings.AddressType addressType;
     private int discoveryPort;
     private AwsClient awsClient;
     private InternalLog log;
@@ -35,7 +36,6 @@ public class AsgResolver extends BaseRemotesResolver {
     @Override
     protected void internalInit(Config config, LogService logService, DependencyResolver externalDependencies) {
         log = logService.getUserLog(AsgResolver.class);
-        log.info("Init of discovery plugin "+this.configDescription());
 
         discoveryPort = checkConfig(config, DiscoverySettings.discovery_listen_address).getPort();
 
@@ -45,17 +45,21 @@ public class AsgResolver extends BaseRemotesResolver {
         awsKey = config.get(Ec2Settings.aws_key);
         awsSecret = config.get(Ec2Settings.aws_secret);
 
+        addressType = config.get(Ec2Settings.aws_address_type);
+
+        log.info("Init of discovery plugin "+this.configDescription());
+
         awsClient = externalDependencies.containsDependency(AwsClient.class)
                 ? externalDependencies.resolveDependency(AwsClient.class)
-                : instantiateAwsClient(awsKey, awsSecret, awsRegion);
+                : instantiateAwsClient(awsKey, awsSecret, awsRegion, addressType);
 
     }
 
-    private AwsClient instantiateAwsClient(String accessKey, String secretKey, String region) {
+    private AwsClient instantiateAwsClient(String accessKey, String secretKey, String region, Ec2Settings.AddressType addressType) {
         if (accessKey != null  && secretKey != null) {
-            return new AwsClient(accessKey, secretKey, region);
+            return new AwsClient(accessKey, secretKey, region, addressType);
         } else {
-            return new AwsClient(region);
+            return new AwsClient(region, addressType);
         }
     }
 

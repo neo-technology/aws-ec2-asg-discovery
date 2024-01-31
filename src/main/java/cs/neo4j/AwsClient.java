@@ -23,20 +23,23 @@ public class AwsClient extends LifecycleAdapter {
     private static String accessKey;
     private static String secretKey;
     private static String region;
+    private static Ec2Settings.AddressType addressType;
 
 
     private AutoScalingClient autoScalingClient;
     private Ec2Client ec2Client;
 
-    public AwsClient(String region) {
+    public AwsClient(String region, Ec2Settings.AddressType addressType) {
         this.region=region;
+        this.addressType=addressType;
         createClients();
     }
 
-    public AwsClient(String accessKey, String secretKey, String region) {
+    public AwsClient(String accessKey, String secretKey, String region, Ec2Settings.AddressType addressType) {
         this.accessKey=accessKey;
         this.secretKey=secretKey;
         this.region=region;
+        this.addressType=addressType;
 
         createClients();
     }
@@ -107,13 +110,23 @@ public class AwsClient extends LifecycleAdapter {
                 })
                 .filter (i -> i.state().nameAsString().equals("running"))
                 .map( i -> {
-                                if (i.privateDnsName() != null) {
+                                if (addressType.equals(Ec2Settings.AddressType.PRIVATE_DNSNAME) &&
+                                        i.privateDnsName() != null) {
                                     return i.privateDnsName();
-                                } else {
+                                }
+                                if (addressType.equals(Ec2Settings.AddressType.PRIVATE_IP) &&
+                                            i.privateIpAddress() != null) {
                                     return i.privateIpAddress();
                                 }
-                                //i.publicIpAddress()
-                                //i.publicDnsName()
+                                if (addressType.equals(Ec2Settings.AddressType.PUBLIC_DNSNAME) &&
+                                        i.publicDnsName() != null) {
+                                    return i.publicDnsName();
+                                }
+                                if (addressType.equals(Ec2Settings.AddressType.PUBLIC_IP) &&
+                                        i.publicIpAddress() != null) {
+                                    return i.publicIpAddress();
+                                }
+                                return "";
                             });
 
     }
