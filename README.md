@@ -23,12 +23,16 @@ Note: there could be changes to the plugin API.
 
 **Settings**
 
+- `server.config.strict_validation.enabled=false` : to disable strict settings validation, which will allow the usage of the following plugin-specific settings (You'll still get Warnings : "Unrecognized setting").
+
 - `discovery.aws.asg_name=<asg_name>` : the name of the Auto-scaling group
 - `discovery.aws.region=<region>`     : the AWS region hosting the Auto-scaling group (ex: "eu-west-1")
 
 Optionally :
 - `discovery.aws.key=<key>`           : the Access Key of the user connecting to the AWS API.
 - `discovery.aws.secret=<secret>`     : the Secret Key of the user connecting to the AWS API
+
+
 If not set, the plugin will try to use any InstanceProfile role attached to the EC2 instance. That can be defined in the ASG's LaunchTemplate.
 
 **Permissions**
