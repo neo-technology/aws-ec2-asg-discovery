@@ -5,6 +5,8 @@ import org.neo4j.kernel.lifecycle.LifecycleAdapter;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.neo4j.logging.InternalLog;
+import org.neo4j.logging.internal.LogService;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
@@ -27,21 +29,23 @@ public class AwsClient extends LifecycleAdapter {
     private static String region;
     private static Ec2Settings.AddressType addressType;
 
-
+    private InternalLog log;
     private AutoScalingClient autoScalingClient;
     private Ec2Client ec2Client;
 
-    public AwsClient(String region, Ec2Settings.AddressType addressType) {
+    public AwsClient(String region, Ec2Settings.AddressType addressType, InternalLog log) {
         this.region=region;
         this.addressType=addressType;
+        this.log=log;
         createClients();
     }
 
-    public AwsClient(String accessKey, String secretKey, String region, Ec2Settings.AddressType addressType) {
+    public AwsClient(String accessKey, String secretKey, String region, Ec2Settings.AddressType addressType, InternalLog log) {
         this.accessKey=accessKey;
         this.secretKey=secretKey;
         this.region=region;
         this.addressType=addressType;
+        this.log=log;
 
         createClients();
     }
@@ -68,7 +72,7 @@ public class AwsClient extends LifecycleAdapter {
             Ec2MetadataClient imdsClient = Ec2MetadataClient.builder()
                     .build();
             Ec2MetadataResponse metadataResponse = imdsClient.get("/latest/meta-data/");
-            System.out.println(metadataResponse.asString());
+            log.info(metadataResponse.asString());
         }
 
     }

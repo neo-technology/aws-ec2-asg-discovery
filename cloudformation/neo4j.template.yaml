@@ -552,7 +552,7 @@ Resources:
             - "    echo \"dbms.cluster.minimum_initial_system_primaries_count=${nodeCount}\" >> /etc/neo4j/neo4j.conf\n"
             - "    echo \"dbms.cluster.discovery.resolver_type=EC2-ASG\" >> /etc/neo4j/neo4j.conf\n"
             - "    echo \"dbms.cluster.discovery.aws.asg_name=$stackName\" >> /etc/neo4j/neo4j.conf\n"
-            - "    echo \"dbms.cluster.discovery.aws.region=$region\" >> /etc/neo4j/neo4j.conf\n"
+            - "    echo \"initial.dbms.automatically_enable_free_servers=true\" >> /etc/neo4j/neo4j.conf\n"
             - "  fi\n"
             - "  neo4j-admin server memory-recommendation >> /etc/neo4j/neo4j.conf\n"
             - "}\n"

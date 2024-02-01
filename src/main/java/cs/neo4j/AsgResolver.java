@@ -57,9 +57,9 @@ public class AsgResolver extends BaseRemotesResolver {
 
     private AwsClient instantiateAwsClient(String accessKey, String secretKey, String region, Ec2Settings.AddressType addressType) {
         if (accessKey != null  && secretKey != null) {
-            return new AwsClient(accessKey, secretKey, region, addressType);
+            return new AwsClient(accessKey, secretKey, region, addressType, log);
         } else {
-            return new AwsClient(region, addressType);
+            return new AwsClient(region, addressType, log);
         }
     }
 
@@ -81,7 +81,7 @@ public class AsgResolver extends BaseRemotesResolver {
     @Override
     protected String configDescription() {
         return format(
-                "{awsRegion:'%s',ASG name:'%s'}",
+                "{awsRegion:'%s', ASG name:'%s'}",
                 awsRegion, selector);
     }
 
