@@ -6,13 +6,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.neo4j.logging.InternalLog;
-import org.neo4j.logging.internal.LogService;
+
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
-import software.amazon.awssdk.imds.Ec2MetadataClient;
-import software.amazon.awssdk.imds.Ec2MetadataResponse;
+
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient;
 import software.amazon.awssdk.services.autoscaling.model.AutoScalingGroup;
