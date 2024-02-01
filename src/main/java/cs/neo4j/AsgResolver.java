@@ -40,7 +40,7 @@ public class AsgResolver extends BaseRemotesResolver {
         discoveryPort = checkConfig(config, DiscoverySettings.discovery_listen_address).getPort();
 
         selector = checkConfig(config, Ec2Settings.asg_name);
-        awsRegion = checkConfig(config, Ec2Settings.aws_region);
+        awsRegion = config.get(Ec2Settings.aws_region);
 
         awsKey = config.get(Ec2Settings.aws_key);
         awsSecret = config.get(Ec2Settings.aws_secret);

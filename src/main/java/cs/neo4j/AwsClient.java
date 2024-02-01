@@ -9,6 +9,8 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.InstanceProfileCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.imds.Ec2MetadataClient;
+import software.amazon.awssdk.imds.Ec2MetadataResponse;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient;
 import software.amazon.awssdk.services.autoscaling.model.AutoScalingGroup;
@@ -45,15 +47,30 @@ public class AwsClient extends LifecycleAdapter {
     }
 
     private void createClients(){
-        this.autoScalingClient = AutoScalingClient.builder()
-                .region(Region.of(region))
-                .credentialsProvider(awsCredentialsProvider())
-                .build();
+        if (region != null) {
+            this.autoScalingClient = AutoScalingClient.builder()
+                    .region(Region.of(region))
+                    .credentialsProvider(awsCredentialsProvider())
+                    .build();
 
-        this.ec2Client = Ec2Client.builder()
-                .region(Region.of(region))
-                .credentialsProvider(awsCredentialsProvider())
-                .build();
+            this.ec2Client = Ec2Client.builder()
+                    .region(Region.of(region))
+                    .credentialsProvider(awsCredentialsProvider())
+                    .build();
+        } else {
+            this.autoScalingClient = AutoScalingClient.builder()
+                    .credentialsProvider(awsCredentialsProvider())
+                    .build();
+
+            this.ec2Client = Ec2Client.builder()
+                    .credentialsProvider(awsCredentialsProvider())
+                    .build();
+            Ec2MetadataClient imdsClient = Ec2MetadataClient.builder()
+                    .build();
+            Ec2MetadataResponse metadataResponse = imdsClient.get("/latest/meta-data/");
+            System.out.println(metadataResponse.asString());
+        }
+
     }
 
     private AwsCredentialsProvider awsCredentialsProvider() {

@@ -26,15 +26,21 @@ Note: there could be changes to the plugin API.
 - `dbms.cluster.discovery.resolver_type=EC2-ASG`   : select the discovery protocol implemented by this plugin
 - `server.config.strict_validation.enabled=false`  : to disable strict settings validation, which will allow the usage of the following plugin-specific settings (You may still get Warnings : "Unrecognized setting").
 - `dbms.cluster.discovery.aws.asg_name=<asg_name>` : the name of the Auto-scaling group
-- `dbms.cluster.discovery.aws.region=<region>`     : the AWS region hosting the Auto-scaling group (ex: "eu-west-1")
+
 
 Optionally :
+- `dbms.cluster.discovery.aws.region=<region>`     : the AWS region hosting the Auto-scaling group (ex: "eu-west-1")
+
+If not set, the plugin will attempt to retrieve the region from the VM metadata
+
 - `dbms.cluster.discovery.aws.key=<key>`           : the Access Key of the user connecting to the AWS API.
 - `dbms.cluster.discovery.aws.secret=<secret>`     : the Secret Key of the user connecting to the AWS API.
+
+If not set, the plugin will try to use any InstanceProfile role attached to the EC2 instance. That can be defined in the ASG's LaunchTemplate.
+
 - `dbms.cluster.discovery.aws.address_type=<type>` : type of network address to retrieve from the VM, to use for discovery. One of PRIVATE_IP|PRIVATE_DNSNAME|PUBLIC_IP|PUBLIC_DNSNAME. Defaults to PRIVATE_IP. Must match the type of `server.discovery.advertised_address`.
 
 
-If not set, the plugin will try to use any InstanceProfile role attached to the EC2 instance. That can be defined in the ASG's LaunchTemplate.
 
 **Permissions**
 
