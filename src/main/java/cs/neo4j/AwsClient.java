@@ -69,10 +69,10 @@ public class AwsClient extends LifecycleAdapter {
             this.ec2Client = Ec2Client.builder()
                     .credentialsProvider(awsCredentialsProvider())
                     .build();
-            Ec2MetadataClient imdsClient = Ec2MetadataClient.builder()
-                    .build();
-            Ec2MetadataResponse metadataResponse = imdsClient.get("/latest/meta-data/");
-            log.info(metadataResponse.asString());
+//            Ec2MetadataClient imdsClient = Ec2MetadataClient.builder()
+//                    .build();
+//            Ec2MetadataResponse metadataResponse = imdsClient.get("/latest/meta-data/");
+//            log.info(metadataResponse.asString());
         }
 
     }
