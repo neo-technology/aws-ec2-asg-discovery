@@ -3,7 +3,6 @@ package cs.neo4j;
 import org.neo4j.annotations.api.PublicApi;
 import org.neo4j.annotations.service.ServiceProvider;
 import org.neo4j.configuration.Description;
-import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.configuration.SettingsDeclaration;
 import org.neo4j.graphdb.config.Setting;
 
@@ -13,10 +12,10 @@ import static org.neo4j.configuration.SettingValueParsers.STRING;
 import static org.neo4j.configuration.SettingValueParsers.ofEnum;
 
 
-@Description("Settings for Kubernetes")
+@Description("Settings for AWS EC2 Discovery Plugin")
 @ServiceProvider
 @PublicApi
-public class Ec2Settings implements SettingsDeclaration {
+public class Ec2DiscoverySettings implements SettingsDeclaration {
     public enum AddressType {
         PRIVATE_IP,
         PRIVATE_DNSNAME,
@@ -25,7 +24,7 @@ public class Ec2Settings implements SettingsDeclaration {
     }
 
 
-    @Description("Auto-scaling group name")
+    @Description("Auto-scaling group name. Discovery will return the addresses of the VMs within that group.")
     public static final Setting<String> asg_name = newBuilder(
             "dbms.cluster.discovery.aws.asg_name", STRING, null)
             .build();
@@ -45,8 +44,15 @@ public class Ec2Settings implements SettingsDeclaration {
             "dbms.cluster.discovery.aws.region", STRING, null)
             .build();
 
-    @Description("Type of network address to retrieve from the VM, to use for discovery. One of [PRIVATE_IP|PRIVATE_DNSNAME|PUBLIC_IP|PUBLIC_DNSNAME]. Must match type of server.discovery.advertised_address.")
+    @Description("VM Tag. Discovery will return the addresses of the VMs with a matching tag. Format 'dbms.cluster.discovery.aws.vm_tag=key,value'")
+    public static final Setting<String>  vm_tag = newBuilder(
+            "dbms.cluster.discovery.aws.vm_tag", STRING, null)
+            .build();
+
+    @Description("Type of network address to retrieve from the matching VMs, to use for discovery. One of [PRIVATE_IP|PRIVATE_DNSNAME|PUBLIC_IP|PUBLIC_DNSNAME]. Must match type of server.discovery.advertised_address.")
     public static final Setting<AddressType> aws_address_type = newBuilder(
             "dbms.cluster.discovery.aws.address_type", ofEnum(AddressType.class), AddressType.PRIVATE_IP)
             .build();
+
+    //TODO : session_token, proxy
 }
