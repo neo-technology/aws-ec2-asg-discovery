@@ -4,6 +4,7 @@ import com.neo4j.causalclustering.discovery.resolve.RemotesResolver;
 import com.neo4j.configuration.ClusterAddressSettings;
 import com.neo4j.configuration.ClusterNetworkSettings;
 import com.neo4j.configuration.DiscoverySettings;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.neo4j.configuration.Config;
@@ -28,6 +29,10 @@ public class Ec2DiscoveryResolverTest {
 
     LogProvider logProvider = NullLogProvider.getInstance();;
 
+    @BeforeAll
+    public static void init() {
+        System.setProperty("aws.region", "eu-west-1");
+    }
 
     @Test @Disabled
     void shouldReturnName() {
