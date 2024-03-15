@@ -39,10 +39,10 @@ public class Ec2DiscoveryResolver implements RemotesResolver {
 
     @Override
     public void init(Type type, Configuration configuration, LogProvider logProvider) {
-        log.info("Init of discovery plugin "+this.NAME);
         this.type = type;
         this.log = logProvider.getLog(getClass());
         this.configuration = configuration;
+        log.info("Init of discovery plugin "+this.NAME);
 
         this.asgName = configuration.get(Ec2DiscoverySettings.asg_name);
         this.awsRegion = configuration.get(Ec2DiscoverySettings.aws_region);
