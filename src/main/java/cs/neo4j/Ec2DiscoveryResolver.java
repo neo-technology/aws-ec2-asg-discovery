@@ -3,6 +3,7 @@ package cs.neo4j;
 import static com.neo4j.configuration.ClusterBaseSettings.DEFAULT_DISCOVERY_PORT;
 import static com.neo4j.configuration.ClusterBaseSettings.DEFAULT_TRANSACTION_PORT;
 import com.neo4j.causalclustering.discovery.resolve.RemotesResolver;
+import com.neo4j.configuration.ClusterAddressSettings;
 import com.neo4j.configuration.DiscoverySettings;
 import org.neo4j.annotations.service.ServiceProvider;
 import org.neo4j.configuration.helpers.SocketAddress;
@@ -32,6 +33,8 @@ public class Ec2DiscoveryResolver implements RemotesResolver {
     private int discoveryPort;
     private AwsClient awsClient;
 
+    private static String tagSeparator = ":";
+
     @Override
     public String getName() {
         return NAME;
@@ -50,16 +53,21 @@ public class Ec2DiscoveryResolver implements RemotesResolver {
         this.awsSecret = configuration.get(Ec2DiscoverySettings.aws_secret);
         this.addressType = configuration.get(Ec2DiscoverySettings.aws_address_type);
         this.vmTag = configuration.get(Ec2DiscoverySettings.vm_tag);
-        this.vmTagKey = this.vmTag.split(",")[0];
-        this.vmTagValue = this.vmTag.split(",")[1];
+        if (this.vmTag != null) {
+            this.vmTagKey = this.vmTag.split(tagSeparator)[0];
+            this.vmTagValue = this.vmTag.split(tagSeparator)[1];
+        }
 
         discoveryPort = getDiscoveryPort();
         awsClient = instantiateAwsClient();
     }
 
-    private int getDiscoveryPort() {
+    public int getDiscoveryPort() {
         int port=0;
-        port = configuration.get(DiscoverySettings.discovery_listen_address).getPort();
+        port = switch (this.type) {
+            case DISCOVERY -> configuration.get(ClusterAddressSettings.discovery_advertised_address).getPort();
+            case CLUSTER -> configuration.get(ClusterAddressSettings.cluster_advertised_address).getPort();
+        };
         if (port == 0) {
             port = switch (this.type) {
                 case DISCOVERY -> DEFAULT_DISCOVERY_PORT;
@@ -82,20 +90,17 @@ public class Ec2DiscoveryResolver implements RemotesResolver {
     public Stream<SocketAddress> addresses() {
         //TODO: may need to re-instantiate the aws client?
         try {
-            //ASG name tag priority
+            //ASG name priority vs VM tag
             if (this.asgName != null) {
                 return awsClient.getVmAddressesByAsgName(this.asgName)
                         .map(s -> {
                             SocketAddress addr = new SocketAddress(s, discoveryPort);
-
                             return addr;
                         });
             } else if (this.vmTag != null) {
-
                 return awsClient.getVmAddressesByTag(this.vmTagKey, this.vmTagValue)
                         .map(s -> {
                             SocketAddress addr = new SocketAddress(s, discoveryPort);
-
                             return addr;
                         });
             }
