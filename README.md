@@ -1,10 +1,10 @@
 
-**AWS Ec2 Auto-scaling-group Discovery plugin for Neo4j**
+**AWS EC2 Discovery plugin for Neo4j**
 
-This neo4j plugin implements cluster discovery for a cluster deployed on AWS EC2 VMs.
-It retrieves the list of network addresses of the VMs in a neo4j cluster, and feeds it to Neo4j's cluster discovery module.
-The VMs can be found by :
-- The name of the AutoScaling Group they belong to
+This Neo4j plugin provides a list of seed addresses to the discovery process by querying the AWS API for a list of EC2 instances matching certain criteria determined by the plugin settings.
+
+The EC2 instances can be found by :
+- the name of the AutoScaling Group they belong to
 - a Tag
 
 Notes:
@@ -18,7 +18,7 @@ Notes:
 Neo4j 5.18+
 
 
-**Usage**
+**Installation**
 
 - Put the jar in the plugins directory of every neo4j instance of the cluster
 - In neo4j.conf, set the settings below
@@ -26,8 +26,8 @@ Neo4j 5.18+
 
 **Settings**
 
-- `dbms.cluster.discovery.resolver_type=EC2`   : select the discovery protocol implemented by this plugin
-- `server.config.strict_validation.enabled=false`  : to disable strict settings validation, which will allow the usage of the following plugin-specific settings (You may still get Warnings : "Unrecognized setting").
+- `dbms.cluster.discovery.resolver_type=EC2`   : enable the plugin
+- `server.config.strict_validation.enabled=false`  : disable strict settings validation, which will allow the usage of the following plugin-specific settings (You may still get Warnings : "Unrecognized setting").
 
 One of the following to specify how to find the VMs:
 - `dbms.cluster.discovery.aws.asg_name=<asg_name>` : the name of the Auto-scaling group which contains the VMs. Takes precedence over "vm_tag".
@@ -39,7 +39,8 @@ Optionally :
 - `dbms.cluster.discovery.aws.key=<key>`           : the Access Key of the user connecting to the AWS API.
 - `dbms.cluster.discovery.aws.secret=<secret>`     : the Secret Key of the user connecting to the AWS API.
 
-  If key/secret are not set, the plugin will try to use any InstanceProfile role attached to the EC2 instance. See below for required permissions. That can be defined in the ASG's LaunchTemplate.
+  If key/secret are not set, the plugin will try to use any InstanceProfile role attached to the EC2 instance. See below for required permissions. That can be defined in the ASG's LaunchTemplate. 
+  These settings are sensitive and should be stored safely.
 
 - `dbms.cluster.discovery.aws.address_type=<type>` : type of network address to retrieve from the VM, to use for discovery. One of PRIVATE_IP|PRIVATE_DNSNAME|PUBLIC_IP|PUBLIC_DNSNAME. Defaults to PRIVATE_IP. Must match the type of `server.discovery.advertised_address`.
 
